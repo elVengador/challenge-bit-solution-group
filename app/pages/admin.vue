@@ -58,6 +58,10 @@ const onOpenEditProduct = (product: Product) => {
     showForm.value = true
 }
 
+const filters = ref({
+    global: { value: null, matchMode: 'contains' },
+});
+
 </script>
 
 <template>
@@ -67,23 +71,32 @@ const onOpenEditProduct = (product: Product) => {
             <Button @click="onOpenAddProductForm" label="New Product" icon="pi pi-plus" size="small" />
         </div>
         <div class="card">
-            <DataTable :value="products" tableStyle="min-width: 50rem" stripedRows>
-                <Column field="id" header="Id"></Column>
+            <DataTable v-model:filters="filters" :value="products" tableStyle="min-width: 50rem" stripedRows paginator
+                :rows="10" :globalFilterFields="['name', 'description']">
+                <template #header>
+                    <IconField class="w-full">
+                        <InputIcon><i class="pi pi-search" /></InputIcon>
+                        <InputText v-model="filters['global'].value" placeholder="Search by name or description..."
+                            class="w-full" />
+                    </IconField>
+                </template>
+
+                <Column field="id" header="Id" sortable></Column>
                 <Column header="Image">
                     <template #body="slotProps">
                         <img :src="slotProps.data.image || 'https://placehold.co/400x400?text=No+Image'"
                             :alt="slotProps.data.name" class="w-16 shadow-md rounded" />
                     </template>
                 </Column>
-                <Column field="name" header="Name"></Column>
-                <Column field="category" header="Category"></Column>
-                <Column field="price" header="Price">
+                <Column field="name" header="Name" sortable></Column>
+                <Column field="category" header="Category" sortable></Column>
+                <Column field="price" header="Price" sortable>
                     <template #body="slotProps">
                         {{ '$' + slotProps.data.price }}
                     </template>
                 </Column>
-                <Column field="stock" header="Stock"></Column>
-                <Column field="status" header="Status">
+                <Column field="stock" header="Stock" sortable></Column>
+                <Column field="status" header="Status" sortable>
                     <template #body="slotProps">
                         <Tag :value="slotProps.data.status ? 'ACTIVE' : 'INACTIVE'"
                             :severity="slotProps.data.status ? 'success' : 'danger'" />
@@ -92,10 +105,10 @@ const onOpenEditProduct = (product: Product) => {
                 <Column header="Actions">
                     <template #body="slotProps">
                         <div class="flex gap-2">
-                            <Button icon="pi pi-pencil" @click="() => onOpenEditProduct(slotProps.data)" outlined rounded
-                                severity="success" />
-                            <Button icon="pi pi-trash" @click="() => onConfirmDelete(slotProps.data.id)" outlined rounded
-                                severity="danger" />
+                            <Button icon="pi pi-pencil" @click="() => onOpenEditProduct(slotProps.data)" outlined
+                                rounded severity="success" />
+                            <Button icon="pi pi-trash" @click="() => onConfirmDelete(slotProps.data.id)" outlined
+                                rounded severity="danger" />
                         </div>
                     </template>
                 </Column>
