@@ -8,4 +8,5 @@ import Toast from 'primevue/toast';
     <NuxtPage />
   </NuxtLayout>
   <Toast position="bottom-right" />
+  <ConfirmDialog />
 </template>

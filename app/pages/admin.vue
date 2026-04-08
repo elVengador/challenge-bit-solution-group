@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { getProducts } from '~/repository/products.repository';
+import { deleteProduct, getProducts } from '~/repository/products.repository';
 
 definePageMeta({ middleware: 'auth' })
 
+
 const visible = ref(false);
+const toast = useToast();
+const confirm = useConfirm();
 const { data: products, refresh } = await useAsyncData('products', getProducts);
+
 
 const onPostSubmit = () => {
     try {
@@ -16,7 +20,32 @@ const onPostSubmit = () => {
     }
 };
 
+const onDelete = async (id: string) => {
+    try {
+        await deleteProduct(id)
+        refresh()
+        toast.add({ severity: 'success', summary: 'Product deleted', life: 3000 });
+    } catch (error) {
+        console.error({ error })
+    }
+}
+
 const onCloseForm = () => visible.value = false
+
+const onConfirmDelete = (id: string) => {
+    confirm.require({
+        message: 'Are you sure you want to delete the product?',
+        header: 'Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: { label: 'Save' },
+        accept: () => onDelete(id)
+    });
+};
 
 </script>
 
@@ -24,7 +53,7 @@ const onCloseForm = () => visible.value = false
     <main class="p-2">
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-2xl text-center mb-4">Products</h1>
-            <Button @click="visible = true" label="Add" icon="pi pi-plus" size="small" />
+            <Button @click="visible = true" label="New Product" icon="pi pi-plus" size="small" />
         </div>
         <div class="card">
             <DataTable :value="products" tableStyle="min-width: 50rem" stripedRows>
@@ -53,7 +82,8 @@ const onCloseForm = () => visible.value = false
                     <template #body="slotProps">
                         <div class="flex gap-2">
                             <Button icon="pi pi-pencil" outlined rounded severity="success" />
-                            <Button icon="pi pi-trash" outlined rounded severity="danger" />
+                            <Button icon="pi pi-trash" @click="onConfirmDelete(slotProps.data.id)" outlined rounded
+                                severity="danger" />
                         </div>
                     </template>
                 </Column>

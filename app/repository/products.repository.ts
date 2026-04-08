@@ -13,3 +13,10 @@ export const addProduct = async (product: ProductInsert) => {
     const { error } = await supabase.from('products').insert(product);
     if (error) throw Error(error.message)
 }
+
+export const deleteProduct = async (id: string) => {
+    const supabase = useSupabaseClient<Database>();
+    const { error } = await supabase.from('products').delete().eq('id', id);
+
+    if (error) throw Error(error.message);
+}
