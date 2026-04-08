@@ -2,12 +2,13 @@
 import { AddProductValidator } from '../validators/product.validator'
 import type { FormSubmitEvent } from '@primevue/forms';
 import { CATEGORIES } from '~/constants';
-import { addProduct } from '~/repository/products.repository';
+import { addProduct, updateProduct } from '~/repository/products.repository';
 import { newProduct, type Product, type ProductInsert } from '~/utils';
 
+const props = defineProps<{ product: Product | null }>();
 const categories = ref(CATEGORIES);
 const submitted = ref(false)
-const productForm = reactive<Product>(newProduct());
+const productForm = reactive<Product>(props.product ?? newProduct());
 
 const emit = defineEmits<{
     'postSubmit': [data: ProductInsert]
@@ -29,11 +30,11 @@ const onFormSubmit = async ({ valid, states, reset }: FormSubmitEvent) => {
             status: states.status?.value,
             stock: states.stock?.value ?? 0,
         }
-        await addProduct(product)
+        props.product?.id ? await updateProduct(props.product?.id, product) : await addProduct(product)
         Object.assign(productForm, newProduct());
         reset()
         submitted.value = false
-        toast.add({ severity: 'success', summary: 'Product added', life: 3000 });
+        toast.add({ severity: 'success', summary: props.product?.id ? 'Product Updated' : 'Product added', life: 3000 });
         emit('postSubmit', product)
     } catch (error) {
         console.error({ error })
@@ -47,7 +48,6 @@ const search = (event: any) => {
 </script>
 
 <template>
-
     <Form v-slot="$form" :initialValues="productForm" :resolver="AddProductValidator" @submit="onFormSubmit"
         class="flex flex-col gap-4">
         <div class="flex flex-col gap-1">
@@ -91,9 +91,8 @@ const search = (event: any) => {
             <ToggleSwitch id="status" name="status" v-model="productForm.status" />
         </div>
         <div class="flex justify-end gap-2">
-            <Button label="Cancel" text severity="secondary" @click="emit('closeForm')" autofocus />
+            <Button label="Cancel" text severity="secondary" @click="() => emit('closeForm')" autofocus />
             <Button label="Save" severity="contrast" type="submit" autofocus />
         </div>
     </Form>
-
 </template>
