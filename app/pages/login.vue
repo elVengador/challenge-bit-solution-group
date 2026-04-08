@@ -8,6 +8,7 @@ import type { AuthForm } from '~/types/types';
 const supabase = useSupabaseClient();
 const loading = ref(false);
 const initialValues = ref<AuthForm>({ email: '', password: '' });
+const toast = useToast();
 
 const resolver = ({ values }: FormResolverOptions) => {
     const errors: any = {};
@@ -19,17 +20,21 @@ const resolver = ({ values }: FormResolverOptions) => {
 };
 
 const onFormSubmit = async (e: FormSubmitEvent) => {
-    if (!e.valid) return;
+    try {
+        if (!e.valid) return;
 
-    loading.value = true;
-    const { email, password } = e.states;
-    if (!email || !password) return
-    const { error } = await supabase.auth.signInWithPassword({ email: email.value, password: password.value });
-    loading.value = false;
+        loading.value = true;
+        const { email, password } = e.states;
+        if (!email || !password) return
+        const { error } = await supabase.auth.signInWithPassword({ email: email.value, password: password.value });
+        loading.value = false;
 
-    console.log("dd", error)
-    if (error) alert(error.message)
-    else navigateTo('/admin')
+        if (error) toast.add({ severity: 'error', summary: error.message, life: 3000 });
+        else navigateTo('/admin')
+    } catch (error) {
+        toast.add({ severity: 'error', summary: 'Oops, something went wrong. Try again later', life: 3000 });
+    }
+
 };
 </script>
 
@@ -47,7 +52,7 @@ const onFormSubmit = async (e: FormSubmitEvent) => {
                 </div>
 
                 <div class="flex flex-col gap-1">
-                    <Password name="password" placeholder="Contraseña" :feedback="false" toggleMask fluid />
+                    <Password name="password" placeholder="Password" :feedback="false" toggleMask fluid />
                     <Message v-if="$form.password?.invalid" severity="error" size="small">
                         {{ $form.password.error?.message }}
                     </Message>

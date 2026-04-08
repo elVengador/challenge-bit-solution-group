@@ -14,6 +14,8 @@ const emit = defineEmits<{
     'closeForm': []
 }>();
 
+const toast = useToast();
+
 const onFormSubmit = async ({ valid, states, reset }: FormSubmitEvent) => {
     try {
         submitted.value = true
@@ -31,9 +33,11 @@ const onFormSubmit = async ({ valid, states, reset }: FormSubmitEvent) => {
         Object.assign(productForm, newProduct());
         reset()
         submitted.value = false
+        toast.add({ severity: 'success', summary: 'Product added', life: 3000 });
         emit('postSubmit', product)
     } catch (error) {
         console.error({ error })
+        toast.add({ severity: 'error', summary: 'Failed to add product', life: 3000 });
     }
 };
 
