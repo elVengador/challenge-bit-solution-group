@@ -1,9 +1,10 @@
 <script setup lang="ts">
-const user = useSupabaseUser()
 import { Button } from 'primevue';
-const supabase = useSupabaseClient();
-
 import { ref } from "vue";
+
+const user = useSupabaseUser()
+const supabase = useSupabaseClient();
+const username = computed(() => user.value?.user_metadata?.username);
 
 const navigation = ref([
     {
@@ -63,8 +64,9 @@ const toggle = (event: any) => menu.value.toggle(event);
                 </template>
                 <template #end>
                     <div class="flex items-center gap-2">
-                        <Button v-if="user" type="button" icon="pi pi-angle-down" icon-pos="right" label="user"
-                            @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" variant="text" />
+                        <Button v-if="user" type="button" icon="pi pi-angle-down" icon-pos="right"
+                            :label="username ?? 'unknown'" @click="toggle" aria-haspopup="true"
+                            aria-controls="overlay_menu" variant="text" />
                         <Menu ref="menu" :model="UserOptions" :popup="true" />
                         <NuxtLink v-if="!user" to="/login"
                             class="text-sm md:text-base hover:text-green-500 hover:underline"

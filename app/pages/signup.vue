@@ -2,15 +2,17 @@
 import { ref } from 'vue';
 import type { FormResolverOptions, FormSubmitEvent } from '@primevue/forms';
 import { RE_EMAIL } from '~/constants';
-import type { AuthForm } from '~/types/types';
+import type { SignUpForm } from '~/types/types';
 
 const supabase = useSupabaseClient();
 const loading = ref(false);
-const initialValues = ref<AuthForm>({ email: '', password: '' });
+const initialValues = ref<SignUpForm>({ username: '', email: '', password: '' });
 const toast = useToast();
 
 const resolver = ({ values }: FormResolverOptions) => {
     const errors: any = {};
+    if (!values.username) errors.username = [{ message: 'Username is required' }]
+
     if (!values.email) errors.email = [{ message: 'Email is required' }]
     else if (!RE_EMAIL.test(values.email)) errors.email = [{ message: 'Invalid Email' }]
 
@@ -24,10 +26,11 @@ const onFormSubmit = async (e: FormSubmitEvent) => {
     try {
         if (!e.valid) return;
 
+        const { username, email, password } = e.states;
+        if (!username || !email || !password) return
+
         loading.value = true;
-        const { email, password } = e.states;
-        if (!email || !password) return
-        const { error } = await supabase.auth.signUp({ email: email.value, password: password.value });
+        const { error } = await supabase.auth.signUp({ email: email.value, password: password.value, options: { data: { username: username.value, } } });
         loading.value = false;
 
         if (error) toast.add({ severity: 'error', summary: error.message, life: 3000 });
@@ -47,6 +50,13 @@ const onFormSubmit = async (e: FormSubmitEvent) => {
             <h1 class="text-2xl text-center mb-4">Sign Up</h1>
             <Form v-slot="$form" :initialValues="initialValues" :resolver="resolver" @submit="onFormSubmit"
                 class="w-full max-w-[500px] mx-auto flex flex-col gap-4">
+                <div class="flex flex-col gap-1">
+                    <InputText name="username" type="text" placeholder="Username" fluid />
+                    <Message v-if="$form.username?.invalid" severity="error" size="small">
+                        {{ $form.username.error?.message }}
+                    </Message>
+                </div>
+
                 <div class="flex flex-col gap-1">
                     <InputText name="email" type="text" placeholder="Email" fluid />
                     <Message v-if="$form.email?.invalid" severity="error" size="small">

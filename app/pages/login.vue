@@ -3,11 +3,11 @@
 import { ref } from 'vue';
 import type { FormResolverOptions, FormSubmitEvent } from '@primevue/forms';
 import { RE_EMAIL } from '~/constants';
-import type { AuthForm } from '~/types/types';
+import type { LoginForm } from '~/types/types';
 
 const supabase = useSupabaseClient();
 const loading = ref(false);
-const initialValues = ref<AuthForm>({ email: '', password: '' });
+const initialValues = ref<LoginForm>({ email: '', password: '' });
 const toast = useToast();
 
 const resolver = ({ values }: FormResolverOptions) => {
