@@ -11,7 +11,7 @@ const showForm = ref(false);
 const selectedProduct = ref<Product | null>(null)
 const toast = useToast();
 const confirm = useConfirm();
-const { data: products, refresh } = await useAsyncData('products', getProducts);
+const { data, refresh } = await useAsyncData('products', () => getProducts());
 
 
 const onPostSubmit = () => {
@@ -70,7 +70,7 @@ const filters = ref({ global: { value: null, matchMode: 'contains' } });
             <Button @click="onOpenAddProductForm" label="New Product" icon="pi pi-plus" size="small" />
         </div>
         <div class="card">
-            <DataTable v-model:filters="filters" :value="products" tableStyle="min-width: 50rem" stripedRows paginator
+            <DataTable v-model:filters="filters" :value="data?.data" tableStyle="min-width: 50rem" stripedRows paginator
                 :rows="10" :globalFilterFields="['name', 'description']">
                 <template #header>
                     <IconField class="w-full">

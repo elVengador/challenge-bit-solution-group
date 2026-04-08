@@ -1,12 +1,17 @@
 import type { Database } from '~/types/supabase'
 import type { ProductInsert } from '~/utils';
 
-
-export const getProducts = async () => {
+export const getProducts = async (search = '') => {
     const supabase = useSupabaseClient<Database>();
-    const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-    return data;
-}
+
+    let query = supabase
+        .from('products')
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+
+    if (search) query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
+    return await query;
+};
 
 export const addProduct = async (product: ProductInsert) => {
     const supabase = useSupabaseClient<Database>();
