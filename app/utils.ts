@@ -15,3 +15,10 @@ export const newProduct = (): Product => ({
     status: true,
     created_at: ''
 })
+
+export const formatMoney = (money:number)=> {
+  return money.toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  });
+}

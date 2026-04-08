@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Product } from '~/utils';
 import { DEFAULT_IMAGE } from '../constants'
+import { formatMoney } from '../utils'
 
 const props = defineProps<{ product: Product }>();
 </script>
@@ -13,7 +14,7 @@ const props = defineProps<{ product: Product }>();
         <template #title>{{ props.product.name }}</template>
         <template #content>
             <div class="text-4xl">
-                ${{ product.price.toFixed(2) }}
+                {{ formatMoney(product.price) }}
             </div>
         </template>
         <template #footer>
