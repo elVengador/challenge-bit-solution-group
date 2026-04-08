@@ -8,6 +8,7 @@ import { newProduct, type Product, type ProductInsert } from '~/utils';
 const props = defineProps<{ product: Product | null }>();
 const categories = ref(CATEGORIES);
 const submitted = ref(false)
+const loading = ref(false)
 const productForm = reactive<Product>(props.product ?? newProduct());
 
 const emit = defineEmits<{
@@ -21,6 +22,7 @@ const onFormSubmit = async ({ valid, states, reset }: FormSubmitEvent) => {
     try {
         submitted.value = true
         if (!valid) return
+        loading.value = true
         const product: ProductInsert = {
             name: states.name?.value,
             description: states.description?.value ?? '',
@@ -31,12 +33,14 @@ const onFormSubmit = async ({ valid, states, reset }: FormSubmitEvent) => {
             stock: states.stock?.value ?? 0,
         }
         props.product?.id ? await updateProduct(props.product?.id, product) : await addProduct(product)
+        loading.value = false
         Object.assign(productForm, newProduct());
         reset()
         submitted.value = false
         toast.add({ severity: 'success', summary: props.product?.id ? 'Product Updated' : 'Product added', life: 3000 });
         emit('postSubmit', product)
     } catch (error) {
+        loading.value = false
         console.error({ error })
         toast.add({ severity: 'error', summary: 'Failed to add product', life: 3000 });
     }
@@ -92,7 +96,8 @@ const search = (event: any) => {
         </div>
         <div class="flex justify-end gap-2">
             <Button label="Cancel" text severity="secondary" @click="() => emit('closeForm')" autofocus />
-            <Button label="Save" severity="contrast" type="submit" autofocus />
+            <Button :label="loading ? 'Saving...' : 'Save'" :loading="loading" severity="contrast" type="submit"
+                autofocus />
         </div>
     </Form>
 </template>
