@@ -5,6 +5,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
+    "gen-supabase-types": "npx -y supabase gen types typescript --project-id cixksipsblejvolakxnv > app/types/supabase.ts",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"

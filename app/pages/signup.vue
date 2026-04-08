@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import type { FormResolverOptions, FormSubmitEvent } from '@primevue/forms';
 import { RE_EMAIL } from '~/constants';
-import type { AuthForm } from '~/types';
+import type { AuthForm } from '~/types/types';
 
 const supabase = useSupabaseClient();
 const loading = ref(false);
