@@ -8,6 +8,7 @@ export const getProducts = async (search = '') => {
         .from('products')
         .select('*', { count: 'exact' })
         .order('created_at', { ascending: false })
+        .order('id', { ascending: false });
 
     if (search) query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
     return await query;
