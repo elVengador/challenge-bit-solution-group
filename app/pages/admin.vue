@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { deleteProduct, getProducts } from '~/repository/products.repository';
 import type { Product } from "~/utils";
+import { DEFAULT_IMAGE } from '../constants'
 
 definePageMeta({ middleware: 'auth' })
 
@@ -58,9 +59,7 @@ const onOpenEditProduct = (product: Product) => {
     showForm.value = true
 }
 
-const filters = ref({
-    global: { value: null, matchMode: 'contains' },
-});
+const filters = ref({ global: { value: null, matchMode: 'contains' } });
 
 </script>
 
@@ -84,8 +83,8 @@ const filters = ref({
                 <Column field="id" header="Id" sortable></Column>
                 <Column header="Image">
                     <template #body="slotProps">
-                        <img :src="slotProps.data.image || 'https://placehold.co/400x400?text=No+Image'"
-                            :alt="slotProps.data.name" class="w-16 shadow-md rounded" />
+                        <img :src="slotProps.data.image || DEFAULT_IMAGE" :alt="slotProps.data.name"
+                            class="w-16 shadow-md rounded" />
                     </template>
                 </Column>
                 <Column field="name" header="Name" sortable></Column>
