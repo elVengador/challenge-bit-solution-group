@@ -48,6 +48,11 @@ to authenticated
 using (true) 
 with check (true);
 
+CREATE POLICY "allow public read product" 
+ON public.products 
+FOR SELECT 
+USING (true);
+
 -- 5. Seed Data
 insert into products (name, description, image, category, price, stock, status) values
 ('iPhone 15 Pro', 'Titanium Black, 256GB. The ultimate iPhone cam.', 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=400', 'Electronics', 999.00, 25, true),
